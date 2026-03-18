@@ -43,6 +43,23 @@ bool Pipeline::init(const PipelineParams & params) {
 }
 
 bool Pipeline::synthesize(const PipelineParams & params) {
+    std::vector<float> audio_out;
+    if (!this->synthesize_raw(params, audio_out)) {
+        std::cerr << "Pipeline error: decode failed." << std::endl;
+        return false;
+    }
+
+    if (!save_audio(params.output_path, audio_out, codec_.sample_rate())) {
+        std::cerr << "Pipeline error: save_audio failed to " << params.output_path << std::endl;
+        return false;
+    }
+
+    std::cout << "Saved audio to: " << params.output_path << std::endl;
+    return true;
+}
+
+
+bool Pipeline::synthesize_raw(const PipelineParams & params, std::vector<float>& audio_out) {
     if (!initialized_) {
         std::cerr << "Pipeline not initialized." << std::endl;
         return false;
@@ -99,19 +116,11 @@ bool Pipeline::synthesize(const PipelineParams & params) {
     // 5. Decode
     // codec_.decode() receives codes in row-major (num_codebooks, n_frames),
     // which matches GenerateResult.codes layout.
-    std::vector<float> audio_out;
     if (!codec_.decode(res.codes.data(), res.n_frames, params.gen.n_threads, audio_out)) {
         std::cerr << "Pipeline error: decode failed." << std::endl;
         return false;
     }
-
-    // 6. Save
-    if (!save_audio(params.output_path, audio_out, codec_.sample_rate())) {
-        std::cerr << "Pipeline error: save_audio failed to " << params.output_path << std::endl;
-        return false;
-    }
-
-    std::cout << "Saved audio to: " << params.output_path << std::endl;
+    
     return true;
 }
 

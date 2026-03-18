@@ -43,6 +43,9 @@ public:
     // Run synthesis: text (+ optional reference audio) → WAV
     bool synthesize(const PipelineParams & params);
 
+    // Run synthesis: text (+ optional reference audio) → Vector
+    bool synthesize_raw(const PipelineParams & params, std::vector<float> & audio_out);
+
 private:
     Tokenizer   tokenizer_;
     SlowARModel model_;
