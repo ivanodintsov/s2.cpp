@@ -1,3 +1,5 @@
+#include "../third_party/filesystem.hpp"
+namespace fs = ghc::filesystem;
 #include "s2_pipeline.h"
 #include <iostream>
 #include <string>
@@ -26,6 +28,8 @@ int main(int argc, char ** argv) {
         print_uso();
         return 1;
     }
+
+    fs::u8arguments u8guard(argc, argv);
 
     s2::PipelineParams params;
     // Default paths
