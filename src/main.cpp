@@ -1,6 +1,7 @@
 #include "../third_party/filesystem.hpp"
 namespace fs = ghc::filesystem;
 #include "s2_pipeline.h"
+#include "s2_server.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -21,6 +22,9 @@ void print_uso() {
     std::cout << "  -top-p F                Top-p sampling (default: 0.7)\n";
     std::cout << "  -top-k N                Top-k sampling (default: 30)\n";
     std::cout << "  --repeat-penalty N      Penalize repeat sequence of tokens (default: 1.0 = disabled)\n";
+    std::cout << "  --server                Start http server\n";
+    std::cout << "  -H --host               Server host\n";
+    std::cout << "  -P --port               Server port\n";
 }
 
 int main(int argc, char ** argv) {
@@ -38,6 +42,9 @@ int main(int argc, char ** argv) {
     params.output_path = "out.wav";
     params.text = "Hello world";
     params.vulkan_device = -1;
+
+    int32_t use_server;
+    s2::ServerParams serverParams;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -67,6 +74,12 @@ int main(int argc, char ** argv) {
             if (i + 1 < argc) params.gen.top_k = std::stoi(argv[++i]);
         } else if (arg == "--repeat-penalty") {
             if (i + 1 < argc) params.gen.top_k = std::stoi(argv[++i]);
+        } else if (arg == "--server") {
+            if (i + 1 < argc) use_server = std::stoi(argv[++i]);
+        } else if (arg == "-H" || arg == "--host") {
+            if (i + 1 < argc) serverParams.host = argv[++i];
+        } else if (arg == "-P" || arg == "--port") {
+            if (i + 1 < argc) serverParams.port = std::stoi(argv[++i]);
         } else if (arg == "-h" || arg == "--help") {
             print_uso();
             return 0;
@@ -99,6 +112,20 @@ int main(int argc, char ** argv) {
                 }
             }
         }
+    }
+
+    if (use_server == 1)
+    {
+        serverParams.pipeline = params;
+
+        s2::Server server;
+        if (!server.serve(serverParams))
+        {
+            std::cerr << "Server initialization failed." << std::endl;
+            return 1;
+        }
+        
+        return 0;
     }
 
     s2::Pipeline pipeline;
