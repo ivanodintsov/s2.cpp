@@ -21,7 +21,7 @@ void print_uso() {
     std::cout << "  -temp F                 Sampling temperature (default: 0.7)\n";
     std::cout << "  -top-p F                Top-p sampling (default: 0.7)\n";
     std::cout << "  -top-k N                Top-k sampling (default: 30)\n";
-    std::cout << "  --repeat-penalty N      Penalize repeat sequence of tokens (default: 1.0 = disabled)\n";
+    std::cout << "  --repeat-penalty F      Penalize repeat sequence of tokens (default: 1.0 = disabled)\n";
     std::cout << "  --server                Start http server\n";
     std::cout << "  -H --host               Server host\n";
     std::cout << "  -P --port               Server port\n";

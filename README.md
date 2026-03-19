@@ -137,12 +137,16 @@ Provide a short reference clip (5–30 seconds, WAV or MP3) and a transcript of 
 | `-pa`, `--prompt-audio` | — | Reference audio file for voice cloning (WAV/MP3) |
 | `-pt`, `--prompt-text` | — | Transcript of the reference audio |
 | `-o`, `--output` | `out.wav` | Output WAV file path |
-| `-v`, `--vulkan` | `-1` (CPU) | Vulkan device index (`-1` = CPU only) |
+| `-v`, `-c`, `--vulkan`, `--cuda` | `-1` (CPU) | Vulkan/Cuda device index (`-1` = CPU only) |
 | `-threads N` | `4` | Number of CPU threads |
 | `-max-tokens N` | `512` | Max tokens to generate (~21s of audio per 440 tokens) |
 | `-temp F` | `0.7` | Sampling temperature |
 | `-top-p F` | `0.7` | Top-p nucleus sampling |
 | `-top-k N` | `30` | Top-k sampling |
+| `--repeat-penalty F` | `1.00` | Penalize repeat sequence of tokens |
+| `--server 1` | — | Start http server |
+| `-H`, `--host` | `127.0.0.1` | Server host |
+| `-P`, `--port` | `3030` | Server port |
 
 ---
 
