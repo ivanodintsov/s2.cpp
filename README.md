@@ -3,7 +3,7 @@
 > **ALPHA — EXPERIMENTAL SOFTWARE**
 > This is an early-stage, community-built inference engine. Expect rough edges, missing features, and breaking changes. Not production-ready.
 
-**s2.cpp** — Fish Audio's S2 Pro Dual-AR text-to-speech model running locally via a pure C++/GGML inference engine with CPU and Vulkan GPU backends. No Python runtime required after build.
+**s2.cpp** — Fish Audio's S2 Pro Dual-AR text-to-speech model running locally via a pure C++/GGML inference engine with CPU, Vulkan, and CUDA GPU backends. No Python runtime required after build.
 
 > **Built on Fish Audio S2 Pro**
 > The model weights are licensed under the Fish Audio Research License, Copyright © 39 AI, INC. All Rights Reserved.
@@ -44,13 +44,18 @@ All variants include both the transformer weights and the audio codec in a singl
 - CMake ≥ 3.14
 - C++17 compiler (GCC ≥ 10, Clang ≥ 11, MSVC 2019+)
 - For Vulkan GPU support: Vulkan SDK and `glslc`
+- For CUDA GPU support: CUDA Toolkit ≥ 12.4
+  - **MSVC 2019+ note:** MSVC 2019 and later require CUDA ≥ 12.4 when building GGML. Older CUDA versions will produce compiler compatibility errors; upgrade to 12.4+ to resolve them.
 
 ```bash
 # Ubuntu / Debian
 sudo apt install cmake build-essential
 
-# Vulkan (optional but recommended for GPU acceleration)
+# Vulkan (optional, recommended for GPU acceleration on AMD/Intel/NVIDIA)
 sudo apt install vulkan-tools libvulkan-dev glslc
+
+# CUDA (optional, recommended for NVIDIA GPUs)
+# Install the CUDA Toolkit ≥ 12.4 from https://developer.nvidia.com/cuda-downloads
 ```
 
 ### Runtime
@@ -75,10 +80,26 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel $(nproc)
 ```
 
-### With Vulkan GPU support (recommended)
+### With Vulkan GPU support
 
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DS2_VULKAN=ON
+cmake --build build --parallel $(nproc)
+```
+
+### With CUDA GPU support
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DS2_CUDA=ON
+cmake --build build --parallel $(nproc)
+```
+
+### With both Vulkan and CUDA (select backend at runtime)
+
+You can compile with both backends enabled simultaneously and choose which one to use at runtime via `--vulkan` or `--cuda`:
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DS2_VULKAN=ON -DS2_CUDA=ON
 cmake --build build --parallel $(nproc)
 ```
 
@@ -121,11 +142,24 @@ Provide a short reference clip (5–30 seconds, WAV or MP3) and a transcript of 
   -m s2-pro-q6_k.gguf \
   -t tokenizer.json \
   -text "Text to synthesize." \
-  -v 0 \
+  --vulkan 0 \
   -o output.wav
 ```
 
-`-v 0` selects the first Vulkan device. The transformer runs on GPU; the audio codec always runs on CPU (executes only twice per synthesis).
+`--vulkan 0` selects the first Vulkan device. The transformer runs on GPU; the audio codec always runs on CPU (executes only twice per synthesis).
+
+### GPU inference via CUDA
+
+```bash
+./build/s2 \
+  -m s2-pro-q6_k.gguf \
+  -t tokenizer.json \
+  -text "Text to synthesize." \
+  --cuda 0 \
+  -o output.wav
+```
+
+`--cuda 0` selects the first CUDA device. As with Vulkan, the transformer runs on GPU and the audio codec on CPU.
 
 ### All options
 
@@ -137,7 +171,8 @@ Provide a short reference clip (5–30 seconds, WAV or MP3) and a transcript of 
 | `-pa`, `--prompt-audio` | — | Reference audio file for voice cloning (WAV/MP3) |
 | `-pt`, `--prompt-text` | — | Transcript of the reference audio |
 | `-o`, `--output` | `out.wav` | Output WAV file path |
-| `-v`, `-c`, `--vulkan`, `--cuda` | `-1` (CPU) | Vulkan/Cuda device index (`-1` = CPU only) |
+| `--vulkan N` | — | Use Vulkan backend, device index N (e.g. `--vulkan 0`) |
+| `--cuda N` | — | Use CUDA backend, device index N (e.g. `--cuda 0`) |
 | `-threads N` | `4` | Number of CPU threads |
 | `-max-tokens N` | `512` | Max tokens to generate (~21s of audio per 440 tokens) |
 | `-temp F` | `0.7` | Sampling temperature |
@@ -191,7 +226,7 @@ The C++ engine (`src/`) is built entirely on [ggml](https://github.com/ggml-org/
 - No streaming output — WAV is written only after full generation completes
 - No batch inference
 - Voice cloning quality depends heavily on reference audio length and SNR
-- Windows is tested on CPU only — Vulkan on Windows is untested
+- Windows: CUDA and Vulkan backends are supported; when using MSVC 2019+, ensure CUDA ≥ 12.4 is installed before building
 - macOS is untested
 
 ---

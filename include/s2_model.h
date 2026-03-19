@@ -15,6 +15,9 @@
 #elif defined GGML_USE_CUDA
 #include "ggml-cuda.h"
 #endif
+#ifdef GGML_USE_CUDA
+#include "ggml-cuda.h"
+#endif
 
 #include <cstdint>
 #include <string>
@@ -93,8 +96,8 @@ public:
     SlowARModel();
     ~SlowARModel();
 
-    // Load model from GGUF. vulkan_device=-1 means CPU only.
-    bool load(const std::string & gguf_path, int32_t vulkan_device = -1);
+    // Load model from GGUF. gpu_device=-1 means CPU only.
+    bool load(const std::string & gguf_path, int32_t gpu_device = -1, int32_t backend_type = -1);
 
     // Initialize KV cache for generation
     bool init_kv_cache(int32_t max_seq_len);

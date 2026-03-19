@@ -9,22 +9,22 @@ namespace fs = ghc::filesystem;
 void print_uso() {
     std::cout << "Usage: s2 [options]\n";
     std::cout << "Options:\n";
-    std::cout << "  -m, --model <path>      Path to unified GGUF model\n";
-    std::cout << "  -t, --tokenizer <path>  Path to tokenizer.json\n";
-    std::cout << "  -text <string>          Text to synthesize\n";
-    std::cout << "  -pa, --prompt-audio <p> Path to reference audio for cloning\n";
-    std::cout << "  -pt, --prompt-text <s>  Text of the reference audio for cloning\n";
-    std::cout << "  -o, --output <path>     Output WAV path\n";
+    std::cout << "  -m, --model <path>                  Path to unified GGUF model\n";
+    std::cout << "  -t, --tokenizer <path>              Path to tokenizer.json\n";
+    std::cout << "  -text <string>                      Text to synthesize\n";
+    std::cout << "  -pa, --prompt-audio <p>             Path to reference audio for cloning\n";
+    std::cout << "  -pt, --prompt-text <s>              Text of the reference audio for cloning\n";
+    std::cout << "  -o, --output <path>                 Output WAV path\n";
     std::cout << "  -v, -c, --vulkan, --cuda <device>   Vulkan/Cuda device index (-1 for CPU)\n";
-    std::cout << "  -threads N              Number of CPU threads for inference (default: 4)\n";
-    std::cout << "  -max-tokens N           Max tokens to generate (default: 512, ~24s audio)\n";
-    std::cout << "  -temp F                 Sampling temperature (default: 0.7)\n";
-    std::cout << "  -top-p F                Top-p sampling (default: 0.7)\n";
-    std::cout << "  -top-k N                Top-k sampling (default: 30)\n";
-    std::cout << "  --repeat-penalty F      Penalize repeat sequence of tokens (default: 1.0 = disabled)\n";
-    std::cout << "  --server                Start http server\n";
-    std::cout << "  -H --host               Server host\n";
-    std::cout << "  -P --port               Server port\n";
+    std::cout << "  -threads N                          Number of CPU threads for inference (default: 4)\n";
+    std::cout << "  -max-tokens N                       Max tokens to generate (default: 512, ~24s audio)\n";
+    std::cout << "  -temp F                             Sampling temperature (default: 0.7)\n";
+    std::cout << "  -top-p F                            Top-p sampling (default: 0.7)\n";
+    std::cout << "  -top-k N                            Top-k sampling (default: 30)\n";
+    std::cout << "  --repeat-penalty F                  Penalize repeat sequence of tokens (default: 1.0 = disabled)\n";
+    std::cout << "  --server                            Start http server\n";
+    std::cout << "  -H --host                           Server host\n";
+    std::cout << "  -P --port                           Server port\n";
 }
 
 int main(int argc, char ** argv) {
@@ -41,7 +41,8 @@ int main(int argc, char ** argv) {
     params.tokenizer_path = "tokenizer.json";
     params.output_path = "out.wav";
     params.text = "Hello world";
-    params.npu_device = -1;
+    params.gpu_device = -1;
+    params.backend_type = -1;
 
     int32_t use_server;
     s2::ServerParams serverParams;
@@ -61,9 +62,9 @@ int main(int argc, char ** argv) {
         } else if (arg == "-o" || arg == "--output") {
             if (i + 1 < argc) params.output_path = argv[++i];
         } else if (arg == "-v" || arg == "--vulkan") {
-            if (i + 1 < argc) params.npu_device = std::stoi(argv[++i]); //Vulkan.
+            if (i + 1 < argc) params.gpu_device = std::stoi(argv[++i]); params.backend_type = 0; //Vulkan.
         } else if (arg == "-c" || arg == "--cuda") {
-            if (i + 1 < argc) params.npu_device = std::stoi(argv[++i]); //Cuda.
+            if (i + 1 < argc) params.gpu_device = std::stoi(argv[++i]); params.backend_type = 1; //Cuda.
         } else if (arg == "-threads") {
             if (i + 1 < argc) params.gen.n_threads = std::stoi(argv[++i]);
         } else if (arg == "-max-tokens") {
