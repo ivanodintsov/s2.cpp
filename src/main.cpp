@@ -18,6 +18,7 @@ void print_uso() {
     std::cout << "  -temp F                 Sampling temperature (default: 0.7)\n";
     std::cout << "  -top-p F                Top-p sampling (default: 0.7)\n";
     std::cout << "  -top-k N                Top-k sampling (default: 30)\n";
+    std::cout << "  --repeat-penalty N      Penalize repeat sequence of tokens (default: 1.0 = disabled)\n";
 }
 
 int main(int argc, char ** argv) {
@@ -59,6 +60,8 @@ int main(int argc, char ** argv) {
         } else if (arg == "-top-p") {
             if (i + 1 < argc) params.gen.top_p = std::stof(argv[++i]);
         } else if (arg == "-top-k") {
+            if (i + 1 < argc) params.gen.top_k = std::stoi(argv[++i]);
+        } else if (arg == "--repeat-penalty") {
             if (i + 1 < argc) params.gen.top_k = std::stoi(argv[++i]);
         } else if (arg == "-h" || arg == "--help") {
             print_uso();
