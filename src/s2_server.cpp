@@ -77,13 +77,13 @@ namespace s2
         svr.set_logger([](const auto& req, const auto& res)
             {
                 auto end = std::chrono::high_resolution_clock::now();
-                auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
                     end.time_since_epoch()).count() -
                     std::stoll(res.get_header_value("X-Request-Start", "0"));
 
                 std::cout << "[END] " << req.method << " " << req.path
                     << " -> " << res.status
-                    << " (" << duration << "μs)" << std::endl; });
+                    << " (" << duration << "ms)" << std::endl; });
 
         svr.Post("/generate", [&](const httplib::Request& req, httplib::Response& res)
             {
