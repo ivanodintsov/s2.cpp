@@ -15,7 +15,7 @@ void print_uso() {
     std::cout << "  -pa, --prompt-audio <p> Path to reference audio for cloning\n";
     std::cout << "  -pt, --prompt-text <s>  Text of the reference audio for cloning\n";
     std::cout << "  -o, --output <path>     Output WAV path\n";
-    std::cout << "  -v, --vulkan <device>   Vulkan device index (-1 for CPU)\n";
+    std::cout << "  -v, -c, --vulkan, --cuda <device>   Vulkan/Cuda device index (-1 for CPU)\n";
     std::cout << "  -threads N              Number of CPU threads for inference (default: 4)\n";
     std::cout << "  -max-tokens N           Max tokens to generate (default: 512, ~24s audio)\n";
     std::cout << "  -temp F                 Sampling temperature (default: 0.7)\n";
@@ -41,7 +41,7 @@ int main(int argc, char ** argv) {
     params.tokenizer_path = "tokenizer.json";
     params.output_path = "out.wav";
     params.text = "Hello world";
-    params.vulkan_device = -1;
+    params.npu_device = -1;
 
     int32_t use_server;
     s2::ServerParams serverParams;
@@ -61,7 +61,9 @@ int main(int argc, char ** argv) {
         } else if (arg == "-o" || arg == "--output") {
             if (i + 1 < argc) params.output_path = argv[++i];
         } else if (arg == "-v" || arg == "--vulkan") {
-            if (i + 1 < argc) params.vulkan_device = std::stoi(argv[++i]);
+            if (i + 1 < argc) params.npu_device = std::stoi(argv[++i]); //Vulkan.
+        } else if (arg == "-c" || arg == "--cuda") {
+            if (i + 1 < argc) params.npu_device = std::stoi(argv[++i]); //Cuda.
         } else if (arg == "-threads") {
             if (i + 1 < argc) params.gen.n_threads = std::stoi(argv[++i]);
         } else if (arg == "-max-tokens") {
