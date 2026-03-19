@@ -99,7 +99,7 @@ bool audio_write_wav(const std::string & path, const float * data, size_t n_samp
     return true;
 }
 
-bool audio_write_memory_wav(void** pWavData, size_t* pWavSize, const float * data, size_t n_samples, int32_t sample_rate) {
+bool audio_write_memory_wav(void** wav_buffer, size_t* wav_size, const float * data, size_t n_samples, int32_t sample_rate) {
     drwav wav;
     drwav_data_format format = {};
     format.container     = drwav_container_riff;
@@ -108,7 +108,7 @@ bool audio_write_memory_wav(void** pWavData, size_t* pWavSize, const float * dat
     format.sampleRate    = static_cast<drwav_uint32>(sample_rate);
     format.bitsPerSample = 32;
 
-    if (!drwav_init_memory_write(&wav, pWavData, pWavSize, &format, nullptr)) {
+    if (!drwav_init_memory_write(&wav, wav_buffer, wav_size, &format, nullptr)) {
         std::fprintf(stderr, "[s2_audio] failed to open WAV for writing");
         return false;
     }
@@ -119,16 +119,16 @@ bool audio_write_memory_wav(void** pWavData, size_t* pWavSize, const float * dat
     if (written != static_cast<drwav_uint64>(n_samples)) {
         std::fprintf(stderr, "[s2_audio] WAV write incomplete: %llu / %zu frames\n",
                      (unsigned long long)written, n_samples);
-        audio_free_memory_wav(pWavData, pWavSize, nullptr);
+        audio_free_memory_wav(wav_buffer, wav_size, nullptr);
         return false;
     }
     return true;
 }
 
-void audio_free_memory_wav(void** pWavData, size_t* pWavSize, const drwav_allocation_callbacks* pAllocationCallbacks) {
-    drwav_free(*pWavData, pAllocationCallbacks);
-    *pWavData = nullptr;
-    *pWavSize = 0;
+void audio_free_memory_wav(void** wav_buffer, size_t* wav_size, const drwav_allocation_callbacks* pAllocationCallbacks) {
+    drwav_free(*wav_buffer, pAllocationCallbacks);
+    *wav_buffer = nullptr;
+    *wav_size = 0;
 }
 
 std::vector<float> audio_resample(const float * data, size_t n_samples, int32_t src_rate, int32_t dst_rate) {

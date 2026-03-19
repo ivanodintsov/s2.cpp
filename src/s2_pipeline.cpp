@@ -58,6 +58,27 @@ bool Pipeline::synthesize(const PipelineParams & params) {
     return true;
 }
 
+bool Pipeline::synthesize_to_memory(const PipelineParams & params, void** wav_buffer, size_t* wav_size) {
+    std::vector<float> audio_out;
+    if (!this->synthesize_raw(params, audio_out)) {
+        std::cerr << "Pipeline error: decode failed." << std::endl;
+        return false;
+    }
+
+    if (!audio_write_memory_wav(
+        wav_buffer,
+        wav_size,
+        audio_out.data(),
+        audio_out.size(),
+        codec_.sample_rate()
+    )) {
+        std::cerr << "Pipeline error: audio_write_memory_wav failed" << std::endl;
+        return false;
+    }
+
+    std::cout << "Audio synthesized" << std::endl;
+    return true;
+}
 
 bool Pipeline::synthesize_raw(const PipelineParams & params, std::vector<float>& audio_out) {
     if (!initialized_) {
