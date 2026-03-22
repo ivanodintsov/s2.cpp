@@ -86,7 +86,7 @@ int main(int argc, char ** argv) {
         } else if (arg == "-top-k") {
             if (i + 1 < argc) params.gen.top_k = std::stoi(argv[++i]);
         } else if (arg == "--repeat-penalty") {
-            if (i + 1 < argc) params.gen.top_k = std::stoi(argv[++i]);
+            if (i + 1 < argc) params.gen.repeat_penalty = std::stof(argv[++i]);
         } else if (arg == "--server") {
             if (i + 1 < argc) use_server = std::stoi(argv[++i]);
         } else if (arg == "-H" || arg == "--host") {
