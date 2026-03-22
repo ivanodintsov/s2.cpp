@@ -8,26 +8,6 @@
 
 using json = nlohmann::json;
 
-bool create_directories_recursive(const std::string& path)
-{
-    try
-    {
-        std::filesystem::path dir_path(path);
-        dir_path = dir_path.parent_path();
-
-        if (!dir_path.empty())
-        {
-            std::filesystem::create_directories(dir_path);
-        }
-        return true;
-    }
-    catch (const std::filesystem::filesystem_error& ex)
-    {
-        std::cout << "Error creating directories: " << ex.what() << std::endl;
-        return false;
-    }
-}
-
 namespace s2
 {
     Server::Server() {}
